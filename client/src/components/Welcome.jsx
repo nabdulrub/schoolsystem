@@ -2,7 +2,7 @@ import React from "react";
 
 const Welcome = ({ role, username }) => {
   return (
-    <div className="w-full">
+    <div className="w-full mb-4">
       <p className="text-2xl">
         Welcome back,{" "}
         <span className=" capitalize font-bold">
