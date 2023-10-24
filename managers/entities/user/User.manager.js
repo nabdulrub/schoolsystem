@@ -16,7 +16,7 @@ module.exports = class User {
     this.mongomodels = mongomodels;
     this.tokenManager = managers;
     this.usersCollection = "users";
-    this.userExposed = ["createUser"];
+    this.userExposed = ["createUser", "signInUser"];
   }
 
   async createUser({ username, password }) {

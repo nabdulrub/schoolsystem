@@ -6,6 +6,9 @@ const { cortex, cache } = require("../app");
 const ManagersLoader = require("../loaders/ManagersLoader");
 const UserModel = require("../managers/entities/user/user.model");
 const TokenManager = require("../managers/token/Token.manager");
+const cors = require("cors");
+const responseDispatcher = require("../managers/response_dispatcher/ResponseDispatcher.manager");
+const Response = new responseDispatcher();
 
 const managers = new ManagersLoader({
   config,
@@ -26,7 +29,10 @@ const user = new User({
   managers: tokenManager,
 });
 
-router.post("/register", async (req, res) => {
+router.use(express.json());
+router.use(cors());
+
+router.post("/auth/register", async (req, res) => {
   try {
     const { username, password } = await req.body;
 
@@ -37,16 +43,22 @@ router.post("/register", async (req, res) => {
 
     if (newUser?.error) return res.status(401).json({ message: newUser.error });
 
-    return res
-      .status(201)
-      .json({ message: "User registered successfully", data: newUser });
+    return Response.dispatch(res, {
+      ok: true,
+      data: newUser,
+      message: "User registered successfully",
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    return Response.dispatch(res, {
+      ok: false,
+      error: error,
+      message: "Internal Server Error",
+    });
   }
 });
 
-router.post("/signin", async (req, res) => {
+router.post("/auth/signin", async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -55,10 +67,18 @@ router.post("/signin", async (req, res) => {
     if (existingUser?.error)
       return res.status(404).json({ error: existingUser.error });
 
-    return res.status(200).json({ ...existingUser });
+    return Response.dispatch(res, {
+      ok: true,
+      data: existingUser,
+      message: "User signed in successfully",
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    return Response.dispatch(res, {
+      ok: false,
+      error: error,
+      message: "Internal Server Error",
+    });
   }
 });
 

@@ -18,13 +18,14 @@ const SignIn = ({ setRegister }) => {
       const response = await Axios.post("/auth/signin", {
         ...data,
       });
+      console.log(response.data.dat);
 
-      if (!response.data.auth) return console.log("Error authenticating user!");
+      if (!response.data.ok) return console.log("Error authenticating user!");
 
-      if (response.data.auth) {
+      if (response.data.ok) {
         signIn({
-          token: response.data.token,
-          userData: response.data.user,
+          token: response.data.data.token,
+          userData: response.data.data.user,
         });
         navigate("/dashboard");
         navigate(0);

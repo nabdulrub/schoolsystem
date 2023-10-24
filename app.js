@@ -1,7 +1,8 @@
 const config = require("./config/index.config.js");
 const Cortex = require("ion-cortex");
 const ManagersLoader = require("./loaders/ManagersLoader.js");
-const server = require("./server.js");
+const auth = require("./routes/auth");
+const schools = require("./routes/schools");
 
 const mongoDB = config.dotEnv.MONGO_URI
   ? require("./connect/mongo")({
@@ -28,7 +29,9 @@ const cortex = new Cortex({
 const managersLoader = new ManagersLoader({ config, cache, cortex });
 const managers = managersLoader.load();
 
-server.start();
+managers.userServer.use(auth);
+managers.userServer.use(schools);
+
 managers.userServer.run();
 
 module.export = {

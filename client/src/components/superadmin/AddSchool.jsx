@@ -1,7 +1,10 @@
 import { useForm, Controller } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { Axios } from "../../../api/axios";
+import Cookies from "js-cookie";
 
 const AddSchool = () => {
+  const navigate = useNavigate();
   const {
     control,
     handleSubmit,
@@ -13,11 +16,24 @@ const AddSchool = () => {
     },
   });
 
+  const token = Cookies.get("_school_token");
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+
   const onSubmit = async (data) => {
     try {
-      const response = await Axios.post("/manage/school", {
-        ...data,
-      });
+      const response = await Axios.post(
+        "/schools",
+        {
+          ...data,
+        },
+        { headers }
+      );
+
+      if (response.data.ok) {
+        navigate(0);
+      }
       console.log(response);
     } catch (error) {
       console.error(error);
@@ -25,7 +41,7 @@ const AddSchool = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-[450px]">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-[450px] w-full">
       <div className="flex flex-col gap-4 border-black border-[1px] rounded-md p-4">
         <p className="text-xl font-semibold">Add School</p>
         <Controller
